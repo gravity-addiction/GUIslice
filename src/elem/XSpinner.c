@@ -96,13 +96,13 @@ gslc_tsElemRef* gslc_ElemXSpinnerCreate(gslc_tsGui* pGui, int16_t nElemId, int16
   //        conserve RAM. Potentially leverage GSLC_DEBUG2_PRINT().
   nTxtBoxW = rElem.w - 2 * (nButtonSz);
   // Determine the maximum width of a digit, we will use button size for height.
-  // now we can work out our rectangle  
+  // now we can work out our rectangle
   nTxtBoxH = rElem.h;
 
   nBtnPosY = rElem.y + (rElem.h - nButtonSz) / 2;
 
   // set our intial value for our text field
-  snprintf(acTxtNum, XSPINNER_STR_LEN - 1, "%d", nVal);
+  snprintf(acTxtNum, XSPINNER_STR_LEN - 1, "%hd", nVal);
 
   gslc_tsElem sElem;
 
@@ -119,7 +119,7 @@ gslc_tsElemRef* gslc_ElemXSpinnerCreate(gslc_tsGui* pGui, int16_t nElemId, int16
   pXData->nMax = nMax;
   pXData->nIncr = nIncr;
   pXData->pfuncXInput = cbInput;
-  
+
 
   // Initialize the collection of sub-elements within the compound element
   // - XSELNUM_COMP_CNT defines the maximum number of sub-elements we have allocated space for
@@ -160,7 +160,7 @@ gslc_tsElemRef* gslc_ElemXSpinnerCreate(gslc_tsGui* pGui, int16_t nElemId, int16
   int16_t nOffsetY = rElem.y;
 
   gslc_tsRect rSubElem;
-  
+
   // Create button sub-element
   strcpy(pXData->acIncr,"\030");
   rSubElem = (gslc_tsRect) { nOffsetX+nTxtBoxW, nBtnPosY, nButtonSz, nButtonSz };
@@ -236,11 +236,11 @@ bool gslc_ElemXSpinnerSetChars(void* pvGui,gslc_tsElemRef* pElemRef,uint8_t cInc
   char acIncr[2] = { cIncr, '\0'};
   char acDecr[2] = { cDecr, '\0'};
   gslc_tsElemRef* pElemRefUp = gslc_CollectFindElemById(pGui,&pSpinner->sCollect,SPINNER_ID_BTN_INC);
-  gslc_ElemSetTxtStr(pGui,pElemRefUp,acIncr);        
+  gslc_ElemSetTxtStr(pGui,pElemRefUp,acIncr);
   gslc_tsElemRef* pElemRefDown = gslc_CollectFindElemById(pGui,&pSpinner->sCollect,SPINNER_ID_BTN_DEC);
   gslc_ElemSetTxtStr(pGui,pElemRefDown,acDecr);
-  
-  return true;  
+
+  return true;
 }
 
 
