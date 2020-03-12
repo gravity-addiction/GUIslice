@@ -74,7 +74,7 @@ extern "C" {
   //#include "../configs/ard-shld-adafruit_28_res.h"
   //#include "../configs/ard-shld-eastrising_50_ra8875_res.h"
   //#include "../configs/ard-shld-eastrising_50_ra8875_sumo_res.h"
-  //#include "../configs/ard-shld-eastrising_50_ssd1963_res.h"  
+  //#include "../configs/ard-shld-eastrising_50_ssd1963_res.h"
   //#include "../configs/ard-shld-elegoo_28_res.h"
   //#include "../configs/ard-shld-generic1_35_touch.h"
   //#include "../configs/ard-shld-ili9341_16b_touch.h"
@@ -135,7 +135,7 @@ extern "C" {
 
   // Raspberry Pi / LINUX:
   // ------------------------------------------------------
-  //#include "../configs/rpi-sdl1-default-tslib.h"
+  #include "../configs/rpi-sdl1-default-tslib.h"
   //#include "../configs/rpi-sdl1-default-sdl.h"
   //#include "../configs/linux-sdl1-default-mouse.h"
 
