@@ -211,6 +211,7 @@ bool gslc_Init(gslc_tsGui* pGui,void* pvDriver,gslc_tsPage* asPage,uint8_t nMaxP
 
   //pGui->pfuncXEvent           = NULL; // UNUSED
   pGui->pfuncPinPoll          = NULL;
+  pGui->pfuncXTouchDisabled   = false;
 
   pGui->asInputMap            = NULL;
   pGui->nInputMapMax          = 0;
@@ -278,6 +279,11 @@ bool gslc_Init(gslc_tsGui* pGui,void* pvDriver,gslc_tsPage* asPage,uint8_t nMaxP
 void gslc_SetPinPollFunc(gslc_tsGui* pGui,GSLC_CB_PIN_POLL pfunc)
 {
   pGui->pfuncPinPoll = pfunc;
+}
+
+void gslc_SetTouchDisabled(gslc_tsGui* pGui,bool pbool)
+{
+  pGui->pfuncXTouchDisabled = pbool;
 }
 
 
@@ -2853,7 +2859,7 @@ bool gslc_ElemEvent(void* pvGui,gslc_tsEvent sEvent)
       pfuncXTouch = pElemTracked->pfuncXTouch;
 
       // Invoke the callback function
-      if (pfuncXTouch != NULL) {
+      if (!pGui->pfuncXTouchDisabled && pfuncXTouch != NULL) {
         // Pass in the relative position from corner of element region
         (*pfuncXTouch)(pvGui,(void*)(pElemRefTracked),eTouch,nRelX,nRelY);
       }

@@ -274,7 +274,7 @@ typedef enum {
   GSLC_ACTION_FOCUS_PREV,   ///< Advance focus to the previous GUI element
   GSLC_ACTION_FOCUS_NEXT,   ///< Advance focus to the next GUI element
   GSLC_ACTION_SELECT,       ///< Select the currently focused GUI element
-  GSLC_ACTION_SET_REL,      ///< Adjust value (relative) of focused element  
+  GSLC_ACTION_SET_REL,      ///< Adjust value (relative) of focused element
   GSLC_ACTION_SET_ABS,      ///< Adjust value (absolute) of focused element
   GSLC_ACTION_DEBUG         ///< Internal debug action
 } gslc_teAction;
@@ -724,7 +724,7 @@ typedef struct {
   uint8_t             nRotation;       ///< Adafruit GFX Rotation of display
   #if !defined(DRV_TOUCH_NONE)
     // Touch remapping
-    uint8_t           nTouchRotation;  ///< Touchscreen rotation offset vs display 
+    uint8_t           nTouchRotation;  ///< Touchscreen rotation offset vs display
     uint8_t           nSwapXY;         ///< Adafruit GFX Touch Swap x and y axes
     uint8_t           nFlipX;          ///< Adafruit GFX Touch Flip x axis
     uint8_t           nFlipY;          ///< Adafruit GFX Touch Flip x axis
@@ -794,7 +794,7 @@ typedef struct {
   // Callback functions
   //GSLC_CB_EVENT       pfuncXEvent;      ///< UNUSED: Callback func ptr for events
   GSLC_CB_PIN_POLL    pfuncPinPoll;     ///< Callback func ptr for pin polling
-
+  bool                pfuncXTouchDisabled; ///< Disable Touch Events
 
   // Key/pin input control mapping
   gslc_tsInputMap*    asInputMap;       ///< Array of input maps
@@ -1510,7 +1510,7 @@ void gslc_DrawFillQuad(gslc_tsGui* pGui,gslc_tsPt* psPt,gslc_tsColor nCol);
 ///                            smoothness and performance. Note that 360/nQuality
 ///                            should be an integer result, thus the allowable
 ///                            quality settings are: 360 (max quality), 180, 120,
-///                            90, 72, 60, 45, 40, 36 (low quality), etc. 
+///                            90, 72, 60, 45, 40, 36 (low quality), etc.
 /// \param[in]  nMidX:         Midpoint X coordinate of circle
 /// \param[in]  nMidY:         Midpoint Y coordinate of circle
 /// \param[in]  nRad1:         Inner sector radius (0 for sector / pie, non-zero for ring)
@@ -2459,6 +2459,9 @@ void gslc_SetTouchRemapYX(gslc_tsGui* pGui, bool bSwap);
 
 /// \todo Doc. This API is experimental and subject to change
 void gslc_SetPinPollFunc(gslc_tsGui* pGui, GSLC_CB_PIN_POLL pfunc);
+
+/// \todo Doc. This API is experimental and subject to change
+void gslc_SetTouchDisabled(gslc_tsGui* pGui,bool pbool);
 
 /// \todo Doc. This API is experimental and subject to change
 void gslc_InitInputMap(gslc_tsGui* pGui,gslc_tsInputMap* asInputMap,uint8_t nInputMapMax);
