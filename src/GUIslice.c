@@ -172,6 +172,7 @@ bool gslc_Init(gslc_tsGui* pGui,void* pvDriver,gslc_tsPage* asPage,uint8_t nMaxP
   }
   pGui->bScreenNeedRedraw  = true;
   pGui->bScreenNeedFlip    = false;
+  pGui->bScreenNeedDisabled = false;
 
   gslc_InvalidateRgnReset(pGui);
 
@@ -709,7 +710,9 @@ void gslc_Update(gslc_tsGui* pGui)
   }
 
   // Perform any redraw required for current page
-  gslc_PageRedrawGo(pGui);
+  if (!pGui->bScreenNeedDisabled) {
+    gslc_PageRedrawGo(pGui);
+  }
 
   // Simple "frame" rate reporting
   // - Note that the rate is based on the number of calls to gslc_Update()
@@ -923,6 +926,12 @@ gslc_tsImgRef gslc_ResetImage()
   sImgRef.pvImgRaw  = NULL;
   return sImgRef;
 }
+
+void gslc_SetScreenDisabled(gslc_tsGui* pGui,bool pbool)
+{
+  pGui->bScreenNeedDisabled = pbool;
+}
+
 
 gslc_tsImgRef gslc_GetImageFromFile(const char* pFname,gslc_teImgRefFlags eFmt)
 {

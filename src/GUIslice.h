@@ -786,6 +786,7 @@ typedef struct {
   // Redraw of screen (ie. across page stack)
   bool                bScreenNeedRedraw; ///< Screen requires a redraw
   bool                bScreenNeedFlip;   ///< Screen requires a page flip
+  bool                bScreenNeedDisabled; ///< Screen updates are disabled
 
   // Current clip region
   bool                bInvalidateEn;     ///< A region of the display has been invalidated
@@ -3146,6 +3147,9 @@ void gslc_InputMapAdd(gslc_tsGui* pGui,gslc_teInputRawEvent eInputEvent,int16_t 
 ///
 gslc_tsImgRef gslc_ResetImage();
 
+
+/// \todo Doc. This API is experimental and subject to change
+void gslc_SetScreenDisabled(gslc_tsGui* pGui,bool pbool);
 
 // ------------------------------------------------------------------------
 /// @}
