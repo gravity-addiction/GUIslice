@@ -104,7 +104,7 @@ extern "C" {
   //   confirmed basic operation of the library is successful.
   // #define DEBUG_ERR               1   // 1,2 to enable, 0 to disable
   // Retrieve the current value of DEBUG_ERR from the libs/dbg support
-  #include "dbg/dbg.h"
+  #include "libs/dbg/dbg.h"
   #define DEBUG_ERR get_debug_err()
 
   // Debug initialization message
