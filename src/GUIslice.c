@@ -926,12 +926,6 @@ gslc_tsImgRef gslc_ResetImage()
   return sImgRef;
 }
 
-void gslc_SetScreenDisabled(gslc_tsGui* pGui,bool pbool)
-{
-  pGui->bScreenNeedDisabled = pbool;
-}
-
-
 gslc_tsImgRef gslc_GetImageFromFile(const char* pFname,gslc_teImgRefFlags eFmt)
 {
   gslc_tsImgRef sImgRef;
