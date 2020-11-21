@@ -172,7 +172,7 @@ bool gslc_Init(gslc_tsGui* pGui,void* pvDriver,gslc_tsPage* asPage,uint8_t nMaxP
   }
   pGui->bScreenNeedRedraw  = true;
   pGui->bScreenNeedFlip    = false;
-  pGui->bScreenNeedDisabled = false;
+  pGui->bScreenDisableRedraw = false;
 
   gslc_InvalidateRgnReset(pGui);
 
@@ -709,7 +709,7 @@ void gslc_Update(gslc_tsGui* pGui)
   }
 
   // Perform any redraw required for current page
-  if (!pGui->bScreenNeedDisabled) {
+  if (!pGui->bScreenDisableRedraw) {
     gslc_PageRedrawGo(pGui);
   }
 
@@ -2456,6 +2456,11 @@ int16_t gslc_PageFocusStep(gslc_tsGui* pGui, gslc_tsPage* pPage, bool bNext)
 #endif
 }
 
+
+void gslc_SetScreenDisableRedraw(gslc_tsGui* pGui,bool pbool)
+{
+  pGui->bScreenDisableRedraw = pbool;
+}
 
 // ------------------------------------------------------------------------
 // Element General Functions

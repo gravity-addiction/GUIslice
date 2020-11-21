@@ -786,7 +786,7 @@ typedef struct {
   // Redraw of screen (ie. across page stack)
   bool                bScreenNeedRedraw; ///< Screen requires a redraw
   bool                bScreenNeedFlip;   ///< Screen requires a page flip
-  bool                bScreenNeedDisabled; ///< Screen updates are disabled
+  bool                bScreenDisableRedraw;  ///< Screen redrawing disabled
 
   // Current clip region
   bool                bInvalidateEn;     ///< A region of the display has been invalidated
@@ -3438,6 +3438,8 @@ void gslc_PageRedrawCalc(gslc_tsGui* pGui);
 /// \todo Doc. This API is experimental and subject to change
 int16_t gslc_PageFocusStep(gslc_tsGui* pGui,gslc_tsPage* pPage,bool bNext);
 
+/// \todo Doc. This API is experimental and subject to change
+void gslc_SetScreenDisableRedraw(gslc_tsGui* pGui,bool pbool);
 
 ///
 /// Create an event structure
