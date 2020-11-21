@@ -795,7 +795,8 @@ typedef struct {
   // Callback functions
   //GSLC_CB_EVENT       pfuncXEvent;      ///< UNUSED: Callback func ptr for events
   GSLC_CB_PIN_POLL    pfuncPinPoll;     ///< Callback func ptr for pin polling
-  bool                pfuncXTouchDisabled; ///< Disable Touch Events
+  bool                pfuncXTouchDisabled; ///< Disable touch events
+
 
   // Key/pin input control mapping
   gslc_tsInputMap*    asInputMap;       ///< Array of input maps

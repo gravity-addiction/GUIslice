@@ -287,7 +287,6 @@ void gslc_SetTouchDisabled(gslc_tsGui* pGui,bool pbool)
   pGui->pfuncXTouchDisabled = pbool;
 }
 
-
 void gslc_InitInputMap(gslc_tsGui* pGui,gslc_tsInputMap* asInputMap,uint8_t nInputMapMax)
 {
 #if !(GSLC_FEATURE_INPUT)
