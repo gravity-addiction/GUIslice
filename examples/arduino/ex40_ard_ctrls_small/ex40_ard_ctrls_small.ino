@@ -85,7 +85,7 @@ static int16_t DebugOut(char ch) { if (ch == (char)'\n') Serial.println(""); els
 bool CbBtnCommon(void* pvGui, void *pvElemRef, gslc_teTouch eTouch, int16_t nX, int16_t nY)
 {
   gslc_tsElemRef* pElemRef = (gslc_tsElemRef*)(pvElemRef);
-  gslc_tsElem* pElem = pElemRef->pElem;
+  gslc_tsElem* pElem = gslc_GetElemFromRef(&m_gui,pElemRef);
 
   if (eTouch == GSLC_TOUCH_UP_IN) {
     // From the element's ID we can determine which button was pressed.
@@ -105,7 +105,7 @@ bool CbSlidePos(void* pvGui, void* pvElemRef, int16_t nPos)
 {
   gslc_tsGui*     pGui = (gslc_tsGui*)(pvGui);
   gslc_tsElemRef* pElemRef = (gslc_tsElemRef*)(pvElemRef);
-  gslc_tsElem*    pElem = pElemRef->pElem;
+  gslc_tsElem*    pElem = gslc_GetElemFromRef(pGui,pElemRef);
   int16_t         nVal;
 
   // From the element's ID we can determine which slider was updated.
@@ -114,7 +114,7 @@ bool CbSlidePos(void* pvGui, void* pvElemRef, int16_t nPos)
     // Fetch the slider position (0..100)
     nVal = gslc_ElemXSliderGetPos(pGui, pElemRef);
     // Update the right progress bar
-    gslc_ElemXProgressSetVal(&m_gui, m_pElemProgress2, nVal);
+    gslc_ElemXProgressSetVal(pGui, m_pElemProgress2, nVal);
     break;
   default:
     break;

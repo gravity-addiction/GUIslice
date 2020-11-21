@@ -13,6 +13,7 @@
 *.a
 *.la
 *.lo
+*.dep
 
 # Shared objects (inc. Windows DLLs)
 *.dll
@@ -31,6 +32,10 @@
 # Debug files
 *.dSYM/
 *.su
+
+# IDE files
+.pio/
+.vscode/
 
 # NetBeans files
 nbproject/

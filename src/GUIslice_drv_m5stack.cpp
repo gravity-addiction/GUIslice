@@ -7,7 +7,7 @@
 //
 // The MIT License
 //
-// Copyright 2016-2019 Calvin Hass
+// Copyright 2016-2020 Calvin Hass
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -367,12 +367,12 @@ void gslc_DrvPageFlipNow(gslc_tsGui* pGui)
 // Graphics Primitives Functions
 // -----------------------------------------------------------------------
 
-inline void gslc_DrvDrawPoint_base(int16_t nX, int16_t nY, int16_t nColRaw)
+inline void gslc_DrvDrawPoint_base(int16_t nX, int16_t nY, uint16_t nColRaw)
 {
   m_disp.drawPixel(nX,nY,nColRaw);
 }
 
-inline void gslc_DrvDrawLine_base(int16_t nX0,int16_t nY0,int16_t nX1,int16_t nY1,int16_t nColRaw)
+inline void gslc_DrvDrawLine_base(int16_t nX0,int16_t nY0,int16_t nX1,int16_t nY1,uint16_t nColRaw)
 {
   m_disp.drawLine(nX0,nY0,nX1,nY1,nColRaw);
 }
@@ -605,7 +605,7 @@ void gslc_DrvDrawMonoFromMem(gslc_tsGui* pGui,int16_t nDstX, int16_t nDstY,
 
 void gslc_DrvDrawBmp24FromMem(gslc_tsGui* pGui,int16_t nDstX, int16_t nDstY,const unsigned char* pBitmap,bool bProgMem)
 {
-  const int16_t* pImage = (const int16_t*)pBitmap;
+  const uint16_t* pImage = (const uint16_t*)pBitmap;
   int16_t h = *(pImage++);
   int16_t w = *(pImage++);
   int row, col;
@@ -841,6 +841,7 @@ bool gslc_DrvDrawImage(gslc_tsGui* pGui,int16_t nDstX,int16_t nDstY,gslc_tsImgRe
       }
     #else
       // SD card access not enabled
+      GSLC_DEBUG_PRINT("ERROR: GSLC_SD_EN not enabled\n","");
       return false;
     #endif
 

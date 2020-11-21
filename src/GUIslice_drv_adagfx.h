@@ -10,7 +10,7 @@
 //
 // The MIT License
 //
-// Copyright 2016-2019 Calvin Hass
+// Copyright 2016-2020 Calvin Hass
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -67,6 +67,9 @@ extern "C" {
   #define DRV_TOUCH_TYPE_RES         // Resistive
   #define DRV_TOUCH_TYPE_ANALOG      // Analog
 #elif defined(DRV_TOUCH_ADA_RA8875)
+  #define DRV_TOUCH_TYPE_EXTERNAL
+  #define DRV_TOUCH_TYPE_RES         // Resistive
+#elif defined(DRV_TOUCH_ADA_RA8875_SUMO)
   #define DRV_TOUCH_TYPE_EXTERNAL
   #define DRV_TOUCH_TYPE_RES         // Resistive
 #elif defined(DRV_TOUCH_XPT2046_STM)
@@ -150,6 +153,14 @@ extern "C" {
 
   #define DRV_HAS_DRAW_RECT_ROUND_FRAME  0
   #define DRV_HAS_DRAW_RECT_ROUND_FILL   0
+
+#elif defined(DRV_DISP_ADAGFX_RA8876_GV)
+  #undef DRV_HAS_DRAW_RECT_ROUND_FRAME
+  #undef DRV_HAS_DRAW_RECT_ROUND_FILL
+
+  #define DRV_HAS_DRAW_RECT_ROUND_FRAME  0
+  #define DRV_HAS_DRAW_RECT_ROUND_FILL   0
+
 
 #elif defined(DRV_DISP_ADAGFX_ILI9341)
   // BLIT support in library

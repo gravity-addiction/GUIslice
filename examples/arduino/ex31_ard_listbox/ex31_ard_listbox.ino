@@ -52,7 +52,6 @@
     #define SET_FONT_MODE1 // Enable Teensy extra fonts
   #else // Arduino, etc.
     #include <Adafruit_GFX.h>
-    #include <gfxfont.h>
     #include "Fonts/FreeSansBold12pt7b.h"
     #include "Fonts/FreeSans9pt7b.h"
     #include "Fonts/FreeMono9pt7b.h"
@@ -166,7 +165,7 @@ void ListboxLoad(gslc_tsElemRef* pElemRef)
 bool CbBtnCommon(void* pvGui, void *pvElemRef, gslc_teTouch eTouch, int16_t nX, int16_t nY)
 {
   gslc_tsElemRef* pElemRef = (gslc_tsElemRef*)(pvElemRef);
-  gslc_tsElem* pElem = pElemRef->pElem;
+  gslc_tsElem* pElem = gslc_GetElemFromRef(&m_gui,pElemRef);
 
   if (eTouch == GSLC_TOUCH_UP_IN) {
     // From the element's ID we can determine which button was pressed.
@@ -183,6 +182,7 @@ bool CbBtnCommon(void* pvGui, void *pvElemRef, gslc_teTouch eTouch, int16_t nX, 
 
 bool CbListBox(void* pvGui, void* pvElemRef, int16_t nSelId)
 {
+  gslc_tsGui*     pGui = (gslc_tsGui*)(pvGui);
   gslc_tsElemRef* pElemRef = (gslc_tsElemRef*)(pvElemRef);
   char acTxt[5];
 
@@ -192,12 +192,11 @@ bool CbListBox(void* pvGui, void* pvElemRef, int16_t nSelId)
 
   // Update the status message with the selection
   if (nSelId == XLISTBOX_SEL_NONE) {
-    strncpy(acTxt, "NONE", 5);
+    gslc_StrCopy(acTxt, "NONE", 5);
+  } else {
+    gslc_StrCopy(acTxt, m_astrCountryCodes[nSelId], 5);
   }
-  else {
-    strncpy(acTxt, m_astrCountryCodes[nSelId], 5);
-  }
-  gslc_ElemSetTxtStr(&m_gui, m_pElemSel, acTxt);
+  gslc_ElemSetTxtStr(pGui, m_pElemSel, acTxt);
 
   return true;
 }
@@ -207,7 +206,7 @@ bool CbSlidePos(void* pvGui, void* pvElemRef, int16_t nPos)
 {
   gslc_tsGui*     pGui = (gslc_tsGui*)(pvGui);
   gslc_tsElemRef* pElemRef = (gslc_tsElemRef*)(pvElemRef);
-  gslc_tsElem*    pElem = pElemRef->pElem;
+  gslc_tsElem*    pElem = gslc_GetElemFromRef(pGui,pElemRef);
   int16_t         nVal;
   gslc_tsElemRef* pElemRefTmp = NULL;
 

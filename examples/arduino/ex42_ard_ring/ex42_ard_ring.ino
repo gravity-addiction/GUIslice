@@ -43,7 +43,6 @@
     #define SET_FONT_MODE1 // Enable Teensy extra fonts
   #else // Arduino, etc.
     #include <Adafruit_GFX.h>
-    #include <gfxfont.h>
     #include "Fonts/FreeSansBold12pt7b.h"
     #define FONT_NAME1 &FreeSansBold12pt7b
   #endif
@@ -187,7 +186,7 @@ bool CbSlidePos(void* pvGui, void* pvElemRef, int16_t nPos)
 {
   gslc_tsGui*     pGui = (gslc_tsGui*)(pvGui);
   gslc_tsElemRef* pElemRef = (gslc_tsElemRef*)(pvElemRef);
-  gslc_tsElem*    pElem = pElemRef->pElem;
+  gslc_tsElem*    pElem = gslc_GetElemFromRef(pGui,pElemRef);
   //gslc_tsXSlider* pSlider = (gslc_tsXSlider*)(pElem->pXData);
 
   switch (pElem->nId) {

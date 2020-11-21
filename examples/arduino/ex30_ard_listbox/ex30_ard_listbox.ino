@@ -45,7 +45,6 @@
     #define SET_FONT_MODE1 // Enable Teensy extra fonts
   #else // Arduino, etc.
     #include <Adafruit_GFX.h>
-    #include <gfxfont.h>
     #include "Fonts/FreeSans9pt7b.h"
     #define FONT_NAME1 &FreeSans9pt7b
   #endif
@@ -131,9 +130,9 @@ bool CbListbox(void* pvGui, void* pvElemRef, int16_t nSelId)
   if (nSelId == XLISTBOX_SEL_NONE) {
     snprintf(acTxt, MAX_STR, "NONE");
   } else {
-    gslc_ElemXListboxGetItem(&m_gui, pElemRef, nSelId, acTxt, MAX_STR);
+    gslc_ElemXListboxGetItem(pGui, pElemRef, nSelId, acTxt, MAX_STR);
   }
-  gslc_ElemSetTxtStr(&m_gui, m_pElemSel, acTxt);
+  gslc_ElemSetTxtStr(pGui, m_pElemSel, acTxt);
 
   return true;
 }

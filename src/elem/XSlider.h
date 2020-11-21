@@ -13,7 +13,7 @@
 //
 // The MIT License
 //
-// Copyright 2016-2019 Calvin Hass
+// Copyright 2016-2020 Calvin Hass
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -172,7 +172,7 @@ void gslc_ElemXSliderSetTicks(gslc_tsGui* pGui,gslc_tsElemRef* pElemRef,double *
 /// - Called from gslc_ElemDraw()
 ///
 /// \param[in]  pvGui:       Void ptr to GUI (typecast to gslc_tsGui*)
-/// \param[in]  pvElemRef:   Void ptr to Element (typecast to gslc_tsElemRef*)
+/// \param[in]  pvElemRef:   Void ptr to Element reference (typecast to gslc_tsElemRef*)
 /// \param[in]  eRedraw:     Redraw mode
 ///
 /// \return true if success, false otherwise
@@ -184,7 +184,7 @@ bool gslc_ElemXSliderDraw(void* pvGui,void* pvElemRef,gslc_teRedrawType eRedraw)
 /// - Called from gslc_ElemSendEventTouch()
 ///
 /// \param[in]  pvGui:       Void ptr to GUI (typecast to gslc_tsGui*)
-/// \param[in]  pvElemRef:   Void ptr to Element ref (typecast to gslc_tsElemRef*)
+/// \param[in]  pvElemRef:   Void ptr to Element reference (typecast to gslc_tsElemRef*)
 /// \param[in]  eTouch:      Touch event type
 /// \param[in]  nRelX:       Touch X coord relative to element
 /// \param[in]  nRelY:       Touch Y coord relative to element

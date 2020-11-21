@@ -21,7 +21,7 @@
 //
 // The MIT License
 //
-// Copyright 2016-2019 Calvin Hass
+// Copyright 2016-2020 Calvin Hass
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -102,10 +102,10 @@ extern "C" {
   //   - DEBUG_ERR 2 = Enable verbose error messaging (eg. bad parameters, etc.)
   // - For baseline Arduino UNO, recommended to disable this after one has
   //   confirmed basic operation of the library is successful.
-  // #define DEBUG_ERR               1   // 1,2 to enable, 0 to disable
+  #define DEBUG_ERR               1   // 1,2 to enable, 0 to disable
   // Retrieve the current value of DEBUG_ERR from the libs/dbg support
-  #include "libs/dbg/dbg.h"
-  #define DEBUG_ERR get_debug_err()
+  // #include "libs/dbg/dbg.h"
+  // #define DEBUG_ERR get_debug_err()
 
   // Debug initialization message
   // - By default, GUIslice outputs a message in DEBUG_ERR mode

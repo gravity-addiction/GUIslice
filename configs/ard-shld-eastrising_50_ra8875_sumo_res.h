@@ -25,7 +25,7 @@
 //
 // The MIT License
 //
-// Copyright 2016-2019 Calvin Hass
+// Copyright 2016-2020 Calvin Hass
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,8 +70,7 @@ extern "C" {
   // -----------------------------------------------------------------------------
   #define DRV_DISP_ADAGFX              // Adafruit-GFX library
   #define DRV_DISP_ADAGFX_RA8875_SUMO  // mjs513/RA8875 (fork: RA8875_t4)
-  //#define DRV_TOUCH_ADA_RA8875       // Integrated RA8875 touch driver
-  #define DRV_TOUCH_NONE               // Start off without Touch
+  #define DRV_TOUCH_ADA_RA8875_SUMO    // Integrated RA8875 touch driver
 
   // Select the RA8875 display resolution:
   // - RA8875_480x272 = 480x272 (4.3" display)
@@ -110,6 +109,9 @@ extern "C" {
   //   https://github.com/ImpulseAdventure/GUIslice/wiki/Configure-Touch-Support
   // -----------------------------------------------------------------------------
 
+  // NOTE: sumotoy/RA8875 library touch support requires the following update
+  //       to the RA8875 library config: RA8875\_settings\RA8875UserSettings.h
+  //          - Uncomment #define USE_RA8875_TOUCH
 
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

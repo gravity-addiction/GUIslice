@@ -7,7 +7,7 @@
 //
 // The MIT License
 //
-// Copyright 2016-2019 Calvin Hass
+// Copyright 2016-2020 Calvin Hass
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,11 @@
 #include <stdio.h>
 
 #if (GSLC_USE_PROGMEM)
+  #if defined(__AVR__)
     #include <avr/pgmspace.h>
+  #else
+    #include <pgmspace.h>
+  #endif
 #endif
 
 // ----------------------------------------------------------------------------
@@ -278,7 +282,7 @@ bool gslc_ElemXGraphDraw(void* pvGui,void* pvElemRef,gslc_teRedrawType eRedraw)
   int16_t           nPixX,nPixY,nPixYBase,nPixYOffset;
   gslc_tsColor      colGraph;
 
-  uint8_t           nScrollMax;
+  uint16_t          nScrollMax;
 
   // Initialize color state
   colGraph  = pBox->colGraph;
@@ -295,8 +299,8 @@ bool gslc_ElemXGraphDraw(void* pvGui,void* pvElemRef,gslc_teRedrawType eRedraw)
   }
   pBox->nPlotIndStart  = pBox->nPlotIndStart % pBox->nBufMax;
 
-  uint8_t nPlotInd = 0;
-  uint8_t nIndMax = 0;
+  uint16_t nPlotInd = 0;
+  uint16_t nIndMax = 0;
   nIndMax = (pBox->nBufMax < pBox->nPlotIndMax)? pBox->nBufMax : pBox->nPlotIndMax;
   for (nPlotInd=0;nPlotInd<nIndMax;nPlotInd++) {
 

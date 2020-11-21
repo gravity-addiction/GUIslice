@@ -10,7 +10,7 @@
 //
 // The MIT License
 //
-// Copyright 2016-2019 Calvin Hass
+// Copyright 2016-2020 Calvin Hass
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@
 // Define current release (X.Y.Z) & build number
 // =======================================================================
 
-#define GUISLICE_VER "0.13.0.22"
+#define GUISLICE_VER "0.16.0.4"
 
 #endif // _GUISLICE_VERSION_H_
 

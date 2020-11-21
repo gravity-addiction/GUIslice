@@ -7,7 +7,7 @@
 //
 // The MIT License
 //
-// Copyright 2016-2019 Calvin Hass
+// Copyright 2016-2020 Calvin Hass
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -332,7 +332,16 @@ bool gslc_DrvSetClipRect(gslc_tsGui* pGui,gslc_tsRect* pRect)
     pDriver->rClipRect = *pRect;
   }
 
-  // TODO: For ILI9341, perhaps we can leverage m_disp.setAddrWindow(x0, y0, x1, y1)?
+  // Rendering within clipping regions is provided by TFT_eSPI's
+  // setViewport() API. Enabling this functionality provides
+  // greatly enhanced redraw performance when updating the
+  // entire page.
+  // The setViewport() API is only available in recent versions of
+  // TFT_eSPI (v2.3.2+).
+  #if (TFT_ESPI_FEATURES & 0x0001) // Bit 0 = Viewport capability
+    m_disp.setViewport(pDriver->rClipRect.x,pDriver->rClipRect.y,pDriver->rClipRect.w,pDriver->rClipRect.h,false);
+  #endif
+
   return true;
 }
 
@@ -533,12 +542,12 @@ void gslc_DrvPageFlipNow(gslc_tsGui* pGui)
 // Graphics Primitives Functions
 // -----------------------------------------------------------------------
 
-inline void gslc_DrvDrawPoint_base(int16_t nX, int16_t nY, int16_t nColRaw)
+inline void gslc_DrvDrawPoint_base(int16_t nX, int16_t nY, uint16_t nColRaw)
 {
   m_disp.drawPixel(nX,nY,nColRaw);
 }
 
-inline void gslc_DrvDrawLine_base(int16_t nX0,int16_t nY0,int16_t nX1,int16_t nY1,int16_t nColRaw)
+inline void gslc_DrvDrawLine_base(int16_t nX0,int16_t nY0,int16_t nX1,int16_t nY1,uint16_t nColRaw)
 {
   m_disp.drawLine(nX0,nY0,nX1,nY1,nColRaw);
 }
@@ -771,21 +780,26 @@ void gslc_DrvDrawMonoFromMem(gslc_tsGui* pGui,int16_t nDstX, int16_t nDstY,
 
 void gslc_DrvDrawBmp24FromMem(gslc_tsGui* pGui,int16_t nDstX, int16_t nDstY,const unsigned char* pBitmap,bool bProgMem)
 {
-  const int16_t* pImage = (const int16_t*)pBitmap;
+  const uint16_t* pImage = (const uint16_t*)pBitmap;
   int16_t h = *(pImage++);
   int16_t w = *(pImage++);
-  int row, col;
-  for (row=0; row<h; row++) { // For each scanline...
-    for (col=0; col<w; col++) { // For each pixel...
-      if (bProgMem) {
-        //To read from Flash Memory, pgm_read_XXX is required.
-        //Since image is stored as uint16_t, pgm_read_word is used as it uses 16bit address
-        gslc_DrvDrawPoint_base(nDstX+col, nDstY+row, pgm_read_word(pImage++));
-      } else {
-        gslc_DrvDrawPoint_base(nDstX+col, nDstY+row, *(pImage++));
-      }
-    } // end pixel
-  }
+
+  // Swap the colour byte order when rendering
+  m_disp.setSwapBytes(true); 
+  #if (GSLC_BMP_TRANS_EN)
+    uint16_t nTransRaw = gslc_DrvAdaptColorToRaw(pGui->sTransCol);
+    if (bProgMem) {
+      m_disp.pushImage(nDstX, nDstY, w, h, (const uint16_t*) pImage, nTransRaw); 
+    } else {
+      m_disp.pushImage(nDstX, nDstY, w, h, (uint16_t*) pImage, nTransRaw); 
+    }
+  #else
+    if (bProgMem) {
+      m_disp.pushImage(nDstX, nDstY, w, h, (const uint16_t*) pImage); 
+    } else {
+      m_disp.pushImage(nDstX, nDstY, w, h, (uint16_t*) pImage); 
+    }
+  #endif // GSLC_BMP_TRANS_EN
 }
 
 #if (GSLC_SD_EN)
@@ -1020,6 +1034,7 @@ bool gslc_DrvDrawImage(gslc_tsGui* pGui,int16_t nDstX,int16_t nDstY,gslc_tsImgRe
       }
     #else
       // SD card access not enabled
+      GSLC_DEBUG_PRINT("ERROR: GSLC_SD_EN not enabled\n","");
       return false;
     #endif
 

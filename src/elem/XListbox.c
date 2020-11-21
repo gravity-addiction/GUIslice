@@ -7,7 +7,7 @@
 //
 // The MIT License
 //
-// Copyright 2016-2019 Calvin Hass
+// Copyright 2016-2020 Calvin Hass
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,11 @@
 #include <stdio.h>
 
 #if (GSLC_USE_PROGMEM)
+  #if defined(__AVR__)
     #include <avr/pgmspace.h>
+  #else
+    #include <pgmspace.h>
+  #endif
 #endif
 
 // ----------------------------------------------------------------------------
@@ -70,28 +74,61 @@ extern const char GSLC_PMEM ERRSTR_PXD_NULL[];
 // - A Listbox control
 // ============================================================================
 
-/*
+
 // Basic debug functionality
+/*
 void debug_ElemXListboxDump(gslc_tsGui* pGui, gslc_tsElemRef* pElemRef)
 {
   gslc_tsElem*      pElem = gslc_GetElemFromRef(pGui, pElemRef);
   gslc_tsXListbox*  pListbox = (gslc_tsXListbox*)(pElem->pXData);
 
-  char acTxt[40 + 1];
+  // Prevent runaway looping due to damaged buffer
+  // Don't ask why I know to do this - PaulC
+
+  int16_t    nSafety=0; 
+  char acTxt[50 + 1];
   GSLC_DEBUG2_PRINT("Xlistbox:Dump (nBufPos=%d nItemCnt=%d)\n", pListbox->nBufItemsPos,pListbox->nItemCnt);
   for (unsigned nInd = 0; nInd < pListbox->nBufItemsPos; nInd++) {
+    nSafety++;
+    if (nSafety > pListbox->nBufItemsMax) break;
     char ch = pListbox->pBufItems[nInd];
     if (ch == 0) {
-      snprintf(acTxt, 40,"[%2u] = %02X = [NULL]", nInd, ch);
+      snprintf(acTxt, 40,"0x%04x: [%2u] = %02X = [NULL]", (char*)&pListbox->pBufItems[nInd],nInd, ch);
     }
     else {
-      snprintf(acTxt, 40,"[%2u] = %02X = [%c]", nInd, ch, ch);
+      snprintf(acTxt, 40,"0x%04x: [%2u] = %02X = [%c]", (char*)&pListbox->pBufItems[nInd],nInd, ch, ch);
     }
     GSLC_DEBUG2_PRINT("XListbox:Dump: %s\n", acTxt);
   }
 }
 */
 
+char* gslc_ElemXListboxGetItemAddr(gslc_tsXListbox* pListbox, int16_t nItemCurSel)
+{
+  char*      pBuf = NULL;
+  uint16_t   nBufPos = 0;
+  uint16_t   nItemInd = 0;
+  bool       bFound = false;
+  while (1) {
+    if (nItemInd == nItemCurSel) {
+      bFound = true;
+      break;
+    }
+    if (nBufPos >= pListbox->nBufItemsMax) {
+      break;
+    }
+    if (pListbox->pBufItems[nBufPos] == 0) {
+      nItemInd++;
+    }
+    nBufPos++;
+  }
+  if (bFound) {
+    pBuf = (char*)&(pListbox->pBufItems[nBufPos]);
+    return pBuf;
+  } else {
+    return NULL;
+  }
+}
 
 // Recalculate listbox item sizing if enabled
 bool gslc_ElemXListboxRecalcSize(gslc_tsXListbox* pListbox,gslc_tsRect rElem)
@@ -241,13 +278,8 @@ bool gslc_ElemXListboxAddItem(gslc_tsGui* pGui, gslc_tsElemRef* pElemRef, const 
 
   // Treat this section of the buffer as [char]
   pBuf = (char*)pListbox->pBufItems + nBufItemsPos;
-  strncpy(pBuf, pStrItem, nStrItemLen);
-  pListbox->nBufItemsPos += nStrItemLen;
-
-  // Ensure terminator added
-  pBuf += nStrItemLen;
-  *pBuf = 0;
-  pListbox->nBufItemsPos++;
+  gslc_StrCopy(pBuf, pStrItem, nStrItemLen+1);
+  pListbox->nBufItemsPos += (nStrItemLen+1); // +1 for terminator
 
   pListbox->nItemCnt++;
 
@@ -262,7 +294,135 @@ bool gslc_ElemXListboxAddItem(gslc_tsGui* pGui, gslc_tsElemRef* pElemRef, const 
   return true;
 }
 
-bool gslc_ElemXListboxGetItem(gslc_tsGui* pGui, gslc_tsElemRef* pElemRef, int16_t nItemCurSel, char* pStrItem, uint8_t nStrItemLen)
+bool gslc_ElemXListboxInsertItemAt(gslc_tsGui* pGui, gslc_tsElemRef* pElemRef, uint16_t nInsertPos, 
+  const char* pStrItem)
+{
+  gslc_tsXListbox* pListbox = (gslc_tsXListbox*)gslc_GetXDataFromRef(pGui, pElemRef, GSLC_TYPEX_LISTBOX, __LINE__);
+  if (!pListbox) return false;
+
+  int8_t      nStrItemLen;
+  char*       pBuf = NULL;
+  uint16_t    nBufItemsPos = pListbox->nBufItemsPos;
+  uint16_t    nBufItemsMax = pListbox->nBufItemsMax;
+
+  if (nInsertPos > pListbox->nItemCnt) {
+    GSLC_DEBUG2_PRINT("ERROR: ElemXListboxInsertItemAt() Current Count: %d Invalid Position %d\n", 
+      pListbox->nItemCnt,nInsertPos);
+    return false;
+  }
+  nStrItemLen = strlen(pStrItem);
+
+  if (nStrItemLen == 0) {
+    // Nothing to add
+    return false;
+  }
+
+  // Ensure we won't overrun the buffer, including the terminator
+  if (nBufItemsPos + nStrItemLen + 1 > nBufItemsMax) {
+    GSLC_DEBUG2_PRINT("ERROR: ElemXListboxInsertItemAt() buffer too small\n", "");
+    return false;
+  }
+
+  // If the truncation left nothing to add, skip out now
+  if (nStrItemLen <= 0) {
+    return false;
+  }
+
+//  GSLC_DEBUG2_PRINT("Xlistbox:InsertAt: %d\n", nInsertPos);
+//  debug_ElemXListboxDump(pGui, pElemRef);
+
+  pBuf = gslc_ElemXListboxGetItemAddr(pListbox, nInsertPos);
+  // If position is incorrect, bail out...
+  if (pBuf == NULL) {
+    return false;
+  }
+ 
+  // Make a hole in the buffer to slot in the new item
+  char* pSrc = (char*)pListbox->pBufItems+nBufItemsPos-1;
+  char* pDest = pSrc+nStrItemLen+1;  
+  int16_t nMoveLen = (int16_t)(pSrc - pBuf)+1;
+  uint8_t ch;
+  for (uint16_t nInd = 0; nInd < nMoveLen; nInd++) {
+    ch = *pSrc;
+    *pDest = ch;
+    pDest--;
+    pSrc--;
+  }
+  
+  // Now slot in the new item
+  memcpy(pBuf, pStrItem, nStrItemLen+1);
+
+  // update our buffer information
+  pListbox->nBufItemsPos += nStrItemLen+1;
+  pListbox->nItemCnt++;
+
+//  GSLC_DEBUG2_PRINT("Xlistbox:After InsertAt %d\n", nInsertPos);
+//  debug_ElemXListboxDump(pGui, pElemRef);
+
+  // Indicate sizing may need update
+  pListbox->bNeedRecalc = true;
+
+  // Mark as needing full redraw
+  gslc_ElemSetRedraw(pGui, pElemRef, GSLC_REDRAW_FULL);
+
+  return true;
+}
+
+bool gslc_ElemXListboxDeleteItemAt(gslc_tsGui* pGui, gslc_tsElemRef* pElemRef, uint16_t nDeletePos)
+{
+  gslc_tsXListbox* pListbox = (gslc_tsXListbox*)gslc_GetXDataFromRef(pGui, pElemRef, GSLC_TYPEX_LISTBOX, __LINE__);
+  if (!pListbox) return false;
+
+  int8_t      nStrItemLen;
+  char*       pBuf = NULL;
+  uint16_t    nBufItemsPos = pListbox->nBufItemsPos;
+
+//  GSLC_DEBUG2_PRINT("Xlistbox:DeleteAt: %d\n", nDeletePos);
+//  debug_ElemXListboxDump(pGui, pElemRef);
+
+  pBuf = gslc_ElemXListboxGetItemAddr(pListbox, nDeletePos);
+  // If position is incorrect, bail out...
+  if (pBuf == NULL) {
+    return false;
+  }
+  nStrItemLen = strlen(pBuf);
+  
+  // Pull items after this delete position up to delete this item
+  char* pSrc  = (char*)pBuf+nStrItemLen+1;
+  char* pDest = (char*)pBuf;
+  char* pEndOfBuf = (char*)(pListbox->pBufItems+nBufItemsPos);
+  int16_t nMoveLen = (int16_t)(pEndOfBuf-pSrc)+1;
+  uint8_t ch;
+  if (nMoveLen > 1) {
+    for (uint16_t nInd = 0; nInd < nMoveLen; nInd++) {
+      ch = *pSrc;
+      *pDest = ch;
+      pDest++;
+      pSrc++;
+    }
+  }
+  
+  // update our buffer information
+  pListbox->nBufItemsPos -= nStrItemLen+1;
+  pListbox->nItemCnt--;
+  
+  // unselect item
+  gslc_ElemXListboxSetSel(pGui, pElemRef, XLISTBOX_SEL_NONE);
+
+//  GSLC_DEBUG2_PRINT("Xlistbox:After DeleteAt %d\n", nDeletePos);
+//  debug_ElemXListboxDump(pGui, pElemRef);
+
+  // Indicate sizing may need update
+  pListbox->bNeedRecalc = true;
+
+  // Mark as needing full redraw
+  gslc_ElemSetRedraw(pGui, pElemRef, GSLC_REDRAW_FULL);
+
+  return true;
+}
+
+bool gslc_ElemXListboxGetItem(gslc_tsGui* pGui, gslc_tsElemRef* pElemRef, int16_t nItemCurSel, char* pStrItem, 
+  uint8_t nStrItemLen)
 {
   gslc_tsXListbox* pListbox = (gslc_tsXListbox*)gslc_GetXDataFromRef(pGui, pElemRef, GSLC_TYPEX_LISTBOX, __LINE__);
   if (!pListbox) return false;
@@ -291,10 +451,7 @@ bool gslc_ElemXListboxGetItem(gslc_tsGui* pGui, gslc_tsElemRef* pElemRef, int16_
   }
   if (bFound) {
     pBuf = &(pListbox->pBufItems[nBufPos]);
-    strncpy(pStrItem, (char*)pBuf, nStrItemLen);
-    // Ensure null terminated in case the buffer
-    // was smaller than the item source
-    pStrItem[nStrItemLen - 1] = 0;
+    gslc_StrCopy(pStrItem, (char*)pBuf, nStrItemLen);
     return true;
   } else {
     // If no item was found, return an empty string (NULL)
@@ -784,7 +941,7 @@ bool gslc_ElemXListboxSetScrollPos(gslc_tsGui* pGui, gslc_tsElemRef* pElemRef, u
   if (!pListbox) return false;
 
   bool bOk = false;
-  if ((nScrollPos >= 0) && (nScrollPos < pListbox->nItemCnt)) {
+  if (nScrollPos < pListbox->nItemCnt) {
     bOk = true;
   }
 

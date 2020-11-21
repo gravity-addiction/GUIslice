@@ -46,7 +46,6 @@
     #define SET_FONT_MODE1 // Enable Teensy extra fonts
   #else // Arduino, etc.
     #include <Adafruit_GFX.h>
-    #include <gfxfont.h>
     #include "Fonts/FreeSans9pt7b.h"
     #define FONT_NAME1 &FreeSans9pt7b
   #endif
@@ -130,24 +129,25 @@ static int16_t DebugOut(char ch) { if (ch == (char)'\n') Serial.println(""); els
 // Common Button callback
 bool CbBtnCommon(void* pvGui, void *pvElemRef, gslc_teTouch eTouch, int16_t nX, int16_t nY)
 {
+  gslc_tsGui* pGui = (gslc_tsGui*)pvGui;
   gslc_tsElemRef* pElemRef = (gslc_tsElemRef*)(pvElemRef);
-  gslc_tsElem* pElem = pElemRef->pElem;
+  gslc_tsElem* pElem = gslc_GetElemFromRef(&m_gui,pElemRef);
 
   if (eTouch == GSLC_TOUCH_UP_IN) {
     // From the element's ID we can determine which button was pressed.
     switch (pElem->nId) {
       //<Button Enums !Start!>
     case E_BTN_QUIT:
-      gslc_PopupShow(&m_gui, E_PG_POPUP, true);
+      gslc_PopupShow(pGui, E_PG_POPUP, true);
       break;
     case E_BTN_OK:
-      gslc_PopupHide(&m_gui);
-      gslc_ElemSetTxtStr(&m_gui, m_pTxtStatus, "Stopped!");
+      gslc_PopupHide(pGui);
+      gslc_ElemSetTxtStr(pGui, m_pTxtStatus, "Stopped!");
       m_bQuit = true;
       break;
     case E_BTN_CANCEL:
-      gslc_PopupHide(&m_gui);
-      gslc_ElemSetTxtStr(&m_gui, m_pTxtStatus, "Keep Running!");
+      gslc_PopupHide(pGui);
+      gslc_ElemSetTxtStr(pGui, m_pTxtStatus, "Keep Running!");
       break;
       //<Button Enums !End!>
     default:

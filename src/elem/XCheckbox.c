@@ -7,7 +7,7 @@
 //
 // The MIT License
 //
-// Copyright 2016-2019 Calvin Hass
+// Copyright 2016-2020 Calvin Hass
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,11 @@
 #include <stdio.h>
 
 #if (GSLC_USE_PROGMEM)
+  #if defined(__AVR__)
     #include <avr/pgmspace.h>
+  #else
+    #include <pgmspace.h>
+  #endif
 #endif
 
 // ----------------------------------------------------------------------------
@@ -204,7 +208,7 @@ void gslc_ElemXCheckboxSetStateHelp(gslc_tsGui* pGui,gslc_tsElemRef* pElemRef,bo
   gslc_tsElem* pElem = gslc_GetElemFromRef(pGui,pElemRef);
 
   // Update our data element
-  bool  bCheckedOld = pCheckbox->bChecked;
+  bool const bCheckedOld = pCheckbox->bChecked;
   pCheckbox->bChecked = bChecked;
 
   // Element needs redraw
@@ -227,7 +231,7 @@ void gslc_ElemXCheckboxSetStateHelp(gslc_tsGui* pGui,gslc_tsElemRef* pElemRef,bo
   // - In all cases, return the ElementRef of the element that issued the callback
   //
   // For checkbox:
-  // - If not selected:  return ID_NONE     and state=false
+  // - If not selected:  return current ID  and state=false
   // - If     selected:  return current ID  and state=true
   // For radio button:
   // - If none selected: return ID_NONE     and state=false
@@ -238,11 +242,7 @@ void gslc_ElemXCheckboxSetStateHelp(gslc_tsGui* pGui,gslc_tsElemRef* pElemRef,bo
     int16_t nSelId = GSLC_ID_NONE;
     if (!pCheckbox->bRadio) {
       // Checkbox
-      if (bChecked) {
-        nSelId = pElem->nId;
-      } else {
-        nSelId = GSLC_ID_NONE;
-      }
+      nSelId = pElem->nId;
     } else {
       // Radio button
       // - Determine the group that the radio button belongs to
