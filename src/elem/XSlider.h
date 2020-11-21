@@ -160,7 +160,7 @@ void gslc_ElemXSliderSetPosFunc(gslc_tsGui* pGui,gslc_tsElemRef* pElemRef,GSLC_C
 ///
 /// \param[in]  pGui:        Pointer to GUI
 /// \param[in]  pElemRef:    Pointer to Element reference
-/// \param[in]  nTickArr:    Array of dbl timestamps
+/// \param[in]  nTickArr:    Pointer of dbl types, offset percentages from left side
 ///
 /// \return none
 ///
