@@ -48,8 +48,8 @@ extern "C" {
 #include <stdio.h>
 
 #if defined(DRV_DISP_SDL1)
-  #include <SDL/SDL.h>
-  #include <SDL/SDL_getenv.h>
+  #include <../../SDL/include/SDL.h>
+  #include <../../SDL/include/SDL_getenv.h>
   #include <SDL/SDL_ttf.h>
 #endif
 #if defined(DRV_DISP_SDL2)
